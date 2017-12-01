@@ -1,0 +1,11 @@
+{
+    "name": "QuickItemSwap",
+    "version": "0.1.0",
+    "title": "Quick Item Swap",
+    "author": "Dewin",
+    "contact": "https://github.com/dewiniaid/QuickItemSwap",
+    "homepage": "https://github.com/dewiniaid/QuickItemSwap",
+    "factorio_version": "0.15",
+    "dependencies": ["base >= 0.15"],
+    "description": "Adds keybindings to quickly swap the currently held item (e.g. a belt) to a related one (e.g. a splitter).  Supports a wide variety of items."
+}
