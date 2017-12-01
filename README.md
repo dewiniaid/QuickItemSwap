@@ -48,6 +48,9 @@ For discussion on this topic, find me on IRC or Discord or
 
 ## Changelog
 
+### 0.1.1 (11/30/2017)
+* Flip logic on modules to make more sense: each tier is now a group, rather than each module type being a group.
+ 
 ### 0.1.0 (11/30/2017)
 * First public release.
  

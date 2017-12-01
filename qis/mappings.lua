@@ -263,28 +263,28 @@ Mappings.categories = {
     },
     modules = {
         groups = {
-            speed = {
+            tier1 = {
                 order = 100,
                 items = {
-                    ['speed-module'] = { order = 100, type='level1' },
-                    ['speed-module-2'] = { order = 200, type='level2' },
-                    ['speed-module-3'] = { order = 300, type='level3' },
+                    ['speed-module'] = { order = 100, type='speed' },
+                    ['effectivity-module'] = { order = 200, type='effectivity'  },
+                    ['productivity-module'] = { order = 300, type='productivity'  },
                 }
             },
-            effectivity = {
-                order = 100,
+            tier2 = {
+                order = 200,
                 items = {
-                    ['effectivity-module'] = { order = 100, type='level1'  },
-                    ['effectivity-module-2'] = { order = 200, type='level2'  },
-                    ['effectivity-module-3'] = { order = 300, type='level3'  },
+                    ['speed-module-2'] = { order = 100, type='speed' },
+                    ['effectivity-module-2'] = { order = 200, type='effectivity'  },
+                    ['productivity-module-2'] = { order = 300, type='productivity'  },
                 }
             },
-            productivity = {
-                order = 100,
+            tier3 = {
+                order = 300,
                 items = {
-                    ['productivity-module'] = { order = 100, type='level1'  },
-                    ['productivity-module-2'] = { order = 200, type='level2'  },
-                    ['productivity-module-3'] = { order = 300, type='level3'  },
+                    ['speed-module-3'] = { order = 100, type='speed' },
+                    ['effectivity-module-3'] = { order = 200, type='effectivity'  },
+                    ['productivity-module-3'] = { order = 300, type='productivity'  },
                 }
             },
         }
