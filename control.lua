@@ -176,30 +176,17 @@ script.on_event({defines.events.on_player_removed, defines.events.on_player_left
 end)
 
 
---script.on_event(
---    {"qis-item-next", "qis-item-prev", "qis-group-next", "qis-group-prev"},
---
---    function(event)
---        game.print("-- " .. event.input_name .. " from " .. game.players[event.player_index].name .. " --")
---        for k,v in pairs(event) do game.print(k .. "=" .. v) end
---        game.print("--")
---    end
---)
-
 remote.add_interface(
     "QuickItemSwap",
     {
         dump_quickbar = dump_quickbar,
         dump_inventory = dump_inventory,
-        get_catalog = function() return table.deepcopy(catalog) end,
-        get_data = function() return table.deepcopy(data) end,
-        set_data = function(new) data = table.deepcopy(new); reload_data(); end,
         debug = function(new)
             if new ~= nil then
                 global.debug = new
             end
             return global.debug
         end,
-        eval = function(code) return loadstring(code)() end
+        -- eval = function(code) return loadstring(code)() end
     }
 )
