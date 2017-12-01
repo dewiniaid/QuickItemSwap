@@ -12,9 +12,7 @@ function Lib.wraparound(t, start, reverse)
     --
     -- Behavior if the table changes size during iteration is undefined.
      ]]
-    game.print(reverse)
     local dir = (reverse and -1) or 1
-    game.print(dir)
     local len = #t
     local i = start
     start = start or (reverse and len) or 1

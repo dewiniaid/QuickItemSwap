@@ -37,7 +37,7 @@ already been reported, and report it if not.
 
 I plan to add an API to allow other mods to alter the table of related items used by Quick Item Swap.  In the current
 implementation, the table is created and initialized at startup; the initial data and code that does this
-can be found in `qis/mappings.lua`.
+can be found in [`qis/mappings.lua`](https://github.com/dewiniaid/QuickItemSwap/blob/master/qis/mappings.lua)
 
 Since I'm not the person that will need the API itself, I'd like to gather feedback from those who might want to use it
 in order to develop something sane --- rather than presenting something that doesn't entirely fit your needs as a 
