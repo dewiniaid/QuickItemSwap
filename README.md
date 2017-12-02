@@ -154,9 +154,9 @@ categories = {
             ludicrous = {
                 order = 400,
                 items = {
-                    ['ludicrous-belt'   ] = { order = 100, type = 'belt' },
-                    ['ludicrous-underground-belt' ] = { order = 200, type = 'underground' },
-                    ['ludicroussplitter'         ] = { order = 300, type = 'splitter' },
+                    ['ludicrous-belt'] =             { order = 100, type = 'belt' },
+                    ['ludicrous-underground-belt'] = { order = 200, type = 'underground' },
+                    ['ludicrous-splitter'] =         { order = 300, type = 'splitter' },
                 }
             }
         }
