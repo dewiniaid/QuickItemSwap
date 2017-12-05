@@ -4,7 +4,7 @@ data:extend({
     {
         type = "custom-input",
         name = "qis-item-prev",
-        key_sequence = "CTRL + Y",
+        key_sequence = "CONTROL + Y",
         consuming = "all"
     },
     {
@@ -16,7 +16,7 @@ data:extend({
     {
         type = "custom-input",
         name = "qis-group-prev",
-        key_sequence = "CTRL + SHIFT + Y",
+        key_sequence = "CONTROL + SHIFT + Y",
         consuming = "all"
     },
     {

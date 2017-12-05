@@ -63,13 +63,17 @@ end
 script.on_init(function() rebuild_mappings("init") end)
 script.on_load(on_load)
 script.on_configuration_changed(function(_)
-    game.print("Detected a configuration change.  Rebuilding item mappings.")
+    if global.debug then
+        game.print("[QuickItemSwap] Detected a configuration change.  Rebuilding item mappings.")
+    end
     rebuild_mappings("configuration-changed")
 end
 )
 
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
-    game.print("Detected a mod settings change by " .. game.players[event.player_index].name .. ".  (Type: " .. event.setting_type .. ") Rebuilding item mappings.")
+    if global.debug then
+        game.print("[QuickItemSwap] Detected a mod settings change by " .. game.players[event.player_index].name .. ".  (Type: " .. event.setting_type .. ") Rebuilding item mappings.")
+    end
     rebuild_mappings("settings-changed")
 end)
 
@@ -254,7 +258,7 @@ end
 --function api.eval(code)
 --    return loadstring(code)()
 --end
---
+
 function api.get_events()
     return CUSTOM_EVENTS
 end

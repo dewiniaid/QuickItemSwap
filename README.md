@@ -36,6 +36,11 @@ already been reported, and report it if not.
  
 ## Changelog
 
+### 0.2.1 (2017-12-05)
+* Fix default keybindings for Previous Item and Previous Group.
+* Console announcements when a configuration change is detected are now only displayed in debug mode.  They also now 
+  are prefixed with `[QuickItemSwap]` to indicate they are coming from this mod.
+
 ### 0.2.0 (2017-12-01)
 * Made significant internal changes to allow mod integration
 * Added support for items from Creative Mode
