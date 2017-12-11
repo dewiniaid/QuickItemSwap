@@ -7,9 +7,12 @@ local Mapper = require("qis/mapper")
 base_mappings = Mapper:adopt(require("mappings/base"))
 
 patches = {
-    require("mappings/creative-mode")
+    require("mappings/creative-mode"),
+    require("mappings/LogisticTrainNetwork"),
+    require("mappings/nixie-tubes"),
+    require("mappings/SmartTrains"),
+    require("mappings/VehicleWagon"),
 }
-
 
 mappings = {}
 
