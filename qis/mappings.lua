@@ -144,6 +144,7 @@ Mappings.categories = {
                     ['locomotive'] = { order = 100 },
                     ['cargo-wagon'] = { order = 200 },
                     ['fluid-wagon'] = { order = 300 },
+                    ['artillery-wagon'] = { order = 400 },  -- 0.16 Soon(tm)
                 }
             },
         }
