@@ -7,8 +7,6 @@ have one) and the "Next Related Item" keybind will pick up a Splitter instead (a
 A wide variety of items and groups are supported, including transport belts, inserters, train vehicles,
  railway and rail signals, inserters, pipes, and modules.  Support for entities added by other mods is planned.
  
- **Note**: This is first mod for Factorio, so expect some bugs.
- 
 ## Known Issues
 
 * Items on the quickbar without filters may change locations if the mod selects them, and the quickbar in
@@ -35,6 +33,10 @@ already been reported, and report it if not.
 
  
 ## Changelog
+
+### 0.2.2 (2017-12-11)
+* Add support for items from Logistic Train Network, Smarter Trains, Vehicle Wagon, and Nixie Tubes.
+* Add speculative support for artillery wagons.
 
 ### 0.2.1 (2017-12-05)
 * Fix default keybindings for Previous Item and Previous Group.
