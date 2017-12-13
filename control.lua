@@ -12,6 +12,7 @@ patches = {
     require("mappings/nixie-tubes"),
     require("mappings/SmartTrains"),
     require("mappings/VehicleWagon"),
+    require("mappings/BatteriesNotIncluded"),   -- Temporary
 }
 
 mappings = {}
@@ -275,6 +276,40 @@ function api.reset_mappings()
 end
 
 function api.apply_patch(patchinfo, source)
+    local msg
+    if source then
+        msg = { "While applying a patch from '" .. source .. "':" }
+    else
+        msg = { "While applying a patch from an unknown source:" }
+    end
+
+    local function fail(message)
+        return error(table.concat(msg, "\n") .. "\n\n" .. message .. "\n\nThis is an error in the other mod, not in QuickItemSwap.\n\n" .. serpent.block(patchinfo))
+    end
+
+    -- Validate patch.
+    if not patchinfo.categories then
+        return fail("No `categories` attribute present.")
+    end
+
+    for name, category in pairs(patchinfo.categories) do
+        if category then
+            msg[2] = "In category `" .. name .. "`:"
+            msg[3] = nil
+            if not category.groups then
+                return fail("No `groups` attribute present.")
+            end
+            for name, group in pairs(category.groups) do
+                if group then
+                    msg[3] = "In group `" .. name .. "`:"
+                    if not group.items then
+                        return fail("No `items` attribute present.")
+                    end
+                end
+            end
+        end
+    end
+
     mappings:merge(patchinfo)
     script.raise_event(CUSTOM_EVENTS.on_qis_mappings_patched, { patch = patchinfo, source = source  })
 end
@@ -284,8 +319,7 @@ function api.refresh(only_if_dirty)
 end
 
 function api.validate_mappings(player)
-    printfn = (player and player.print) or game.print
-    mappings:validate(printfn)
+    mappings:validate((player and player.print) or game.print)
 end
 
 function api.dump_mappings(category, group, item)
@@ -296,6 +330,5 @@ function api.dump_mappings(category, group, item)
         )
     )
 end
-
 
 remote.add_interface("QuickItemSwap", api)

@@ -34,6 +34,15 @@ already been reported, and report it if not.
  
 ## Changelog
 
+### 0.2.3 (2017-12-13)
+* Update for Factorio 0.16
+* Temporarily add support for Batteries Not Included, since 
+  [a bug in the current Factorio experimental](https://forums.factorio.com/viewtopic.php?f=182&t=54567&p=321491) prevents 
+  that support from working in the opposite direction.
+* API: Added more verbose error messaging if another mod submits an invalid patch.
+* API: Swapped the order of arguments on `apply_patch` to make it less likely for someone to inadvertently forget to
+  specify `source`.
+
 ### 0.2.2 (2017-12-11)
 * Add support for items from Logistic Train Network, Smarter Trains, Vehicle Wagon, and Nixie Tubes.
 * Add speculative support for artillery wagons.
@@ -128,21 +137,25 @@ If `player` is specified, results will be printed to that player; otherwise they
  
 Produces no output if everything is valid.
 
-#### `remote.call("QuickItemSwap", "apply_patch", patch, source)`
+#### `remote.call("QuickItemSwap", "apply_patch", source, patch)`
 
 Applies a patch to the mapping table.
+
+`source` is the name of your mod, and is used to explains where the patch came from.  It appears in error messages and 
+in the `on_qis_mappings_patched` event.  It is recommended you use the `info.json` name of your mod here for
+consistency, though nothing enforces this.
 
 `patch` consists of a table formatted similar to the mapping table.  (See `mappings/base.lua` for a reference.)  It will be merged into the mapping table using
 the following rules:
 
-- If a category doesn't exist, it will be created.  If it exists, the groups will be merged.  If the patch explicitly sets the category to `false`,
-  the category will be deleted.  If the patch omits the category or sets it to `nil`, it will be left as-is.
+- If a category does not exist, it will be created.  If it exists, the groups will be merged.  If the patch explicitly 
+  sets the category to `false`, the category will be deleted.  If the patch omits the category or sets it to `nil`, it 
+  will be left as-is.
   
-- The above logic applies to groups within a category (with items being merged) and items within a group.
+- The above logic also applies to groups within a category (with items being merged) and items within a group.
 
 - Groups and items may specify a `default_order` attribute which is equivalent to `order` but won't override the 
   existing value if there is one.
-  
   
 Example: You've decided yellow belts are too slow, so your mod rips them out of the game and adds Ludicrous Transport 
 Belts instead.
@@ -173,10 +186,6 @@ categories = {
 
 Note that it is harmless to have items in the mapper that don't have prototypes -- though it will trigger a (probably
 unnoticeable) performance hit when cycling items.
-
-`source` explains where the patch came from.  It is recommended you use the `info.json` name of your mod here for
-consistency, though nothing enforces this.  Currently, the only place `source` appears is in the event that is raised
-when a patch is applied.
 
 #### `remote.call("QuickItemSwap", "dump_inventory", inventory)`
 
