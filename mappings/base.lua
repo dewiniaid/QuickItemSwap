@@ -84,8 +84,9 @@ return { categories = {
                 items = {
                     ['logistic-chest-active-provider'] = { order = 100 },
                     ['logistic-chest-passive-provider'] = { order = 200 },
-                    ['logistic-chest-requester'] = { order = 300 },
-                    ['logistic-chest-storage'] = { order = 400 },
+                    ['logistic-chest-storage'] = { order = 300 },
+                    ['logistic-chest-buffer'] = { order = 400 },
+                    ['logistic-chest-requester'] = { order = 500 },
                 }
             },
         }

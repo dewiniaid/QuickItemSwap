@@ -34,11 +34,13 @@ already been reported, and report it if not.
  
 ## Changelog
 
+### 0.2.4 (2017-12-23)
+* Add support for the unofficial Creative Mode Fix.
+* Add Buffer Chests to the Logistic Chests group, and reordered the group to match the inventory window.
+
 ### 0.2.3 (2017-12-13)
 * Update for Factorio 0.16
-* Temporarily add support for Batteries Not Included, since 
-  [a bug in the current Factorio experimental](https://forums.factorio.com/viewtopic.php?f=182&t=54567&p=321491) prevents 
-  that support from working in the opposite direction.
+* Temporarily add support for Batteries Not Included, since [a bug in the current Factorio experimental](https://forums.factorio.com/viewtopic.php?f=182&t=54567&p=321491) prevents that support from working in the opposite direction.
 * API: Added more verbose error messaging if another mod submits an invalid patch.
 * API: Swapped the order of arguments on `apply_patch` to make it less likely for someone to inadvertently forget to
   specify `source`.

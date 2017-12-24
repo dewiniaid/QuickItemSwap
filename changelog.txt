@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.2.4
+Date: 23. 12. 2017
+  Changes:
+    - Add support for the unofficial Creative Mode Fix.
+    - Add Buffer Chests to the Logistic Chests group, and reordered the group to match the inventory window.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.2.3
+Date: 13. 12. 2017
+  Changes:
+    - Update for Factorio 0.16
+    - Temporarily add support for Batteries Not Included, since [a bug in the current Factorio experimental](https://forums.factorio.com/viewtopic.php?f=182&t=54567&p=321491) prevents that support from working in the opposite direction.
+  Modding:
+    - Added more verbose error messaging if another mod submits an invalid patch.
+    - Swapped the order of arguments on `apply_patch` to make it less likely for someone to inadvertently forget to specify `source`.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.2.2
+Date: 11. 12. 2017
+  Changes:
+    - Add support for items from Logistic Train Network, Smarter Trains, Vehicle Wagon, and Nixie Tubes.
+    - Add speculative support for artillery wagons.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.2.1
+Date: 05. 12. 2017
+  Changes:
+    - Fix default keybindings for Previous Item and Previous Group.
+    - Console announcements when a configuration change is detected are now only displayed in debug mode.  They also now are prefixed with `[QuickItemSwap]` to indicate they are coming from this mod.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.2.0
+Date: 01. 12. 2017
+  Changes:
+    - Added support for items from Creative Mode
+    - Added support for creating items from thin air (rather than skipping over them) when your player is in cheat mode (i.e. as a result of the creative mode mode or `/c game.players[1].cheat_mode = true`).  Can be toggled in settings.  Has no effect when not in cheat mode.
+  Modding:
+    - Made significant internal changes to allow mod integration
+    - First pass of an API to allow other mods to add recipes.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.1.1
+Date: 30. 11. 2017
+  Changes:
+    - Flip logic on modules to make more sense: each tier is now a group, rather than each module type being a group.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.1.0
+Date: 30. 11. 2017
+  Changes:
+    - First public release.
+

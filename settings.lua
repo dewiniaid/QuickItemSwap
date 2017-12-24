@@ -18,7 +18,7 @@ data:extend({
 })
 
 -- Creative Mode support
-if mods["creative-mode"] then
+if mods["creative-mode"] or mods["creative-mode-fix"] then
     data:extend({
         {
             type = "bool-setting",
