@@ -12,7 +12,11 @@ patches = {
     require("mappings/nixie-tubes"),
     require("mappings/SmartTrains"),
     require("mappings/VehicleWagon"),
-    require("mappings/BatteriesNotIncluded"),   -- Temporary
+    require("mappings/BatteriesNotIncluded"),
+    require("mappings/ElectricVehicles3"),
+    require("mappings/FARL"),
+    -- require("mappings/bobinserters"),
+    -- require("mappings/boblogistics")
 }
 
 mappings = {}
@@ -34,6 +38,7 @@ local function setup_playerdata()
             local v = {
                 item_history = {},
                 group_history = {},
+                type_history = {},
             }
             t[k] = v
             return v
@@ -82,6 +87,101 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 end)
 
 
+-- Cycle between blueprints/books/etc
+local function cycle_bp(player, pdata, cursor, change_group, reverse)
+    if cursor.item_number == nil then
+        return
+    end
+    local number = cursor.item_number
+    local qb = player.get_quickbar()
+    local inv = player.get_inventory(defines.inventory.player_main)
+    local stack
+
+    local function foreachitem(fn)
+        for _,where in pairs({qb, inv}) do
+            for i=1,#where do
+                if fn(where[i], i, where) then
+                    return true
+                end
+            end
+        end
+        return false
+    end
+
+    if change_group then
+        local types = {"blueprint", "blueprint-book", "deconstruction-item" }
+        local type_index
+        for ix,type in pairs(types) do
+            if cursor.type == type then
+                type_index = ix
+                break
+            end
+        end
+        if not type_index then
+            return
+        end
+        pdata.type_history = pdata.type_history or {}
+        pdata.type_history[cursor.type] = number
+        for index, type in Lib.wraparound(types, type_index, reverse) do
+            local hist = pdata.type_history[type]
+            foreachitem(function(item)
+                if item.valid_for_read and item.type == type then
+                    if item.item_number == hist or not hist then
+                        stack = item
+                        return true
+                    elseif not stack then
+                        stack = item
+                    end
+
+                end
+            end)
+            if stack then
+                player.clean_cursor()  -- May fail if inv is full, that's okay for now.
+                player.cursor_stack.swap_stack(stack)
+                return
+            end
+        end
+        return
+    end  -- if change_group
+
+    -- If still here, cycling between items within the group
+    local found, stack
+    foreachitem(function(item)
+        if not (item.valid_for_read and item.type == cursor.type and item.item_number) then
+            return
+        end
+        n = item.item_number
+        if not found then
+            found, stack = n, item
+            if global.debug then
+                player.print("cycle_bp: [init] number=" .. number .. ", n=" .. n .. ", found=" .. found)
+            end
+        elseif reverse then
+            if global.debug then player.print("cycle_bp: [step] number=" .. number .. ", n=" .. n .. ", found=" .. found) end
+            if (found > number and (n > found or n < number)) or (n < number and n > found) then
+                found = n
+                stack = item
+                if global.debug then player.print("cycle_bp: result=" .. found) end
+            end
+        else
+            if global.debug then player.print("cycle_bp: [step] number=" .. number .. ", n=" .. n .. ", found=" .. found) end
+            if (found < number and (n < found or n > number)) or (n > number and n < found) then
+                found = n
+                stack = item
+                player.print("cycle_bp: result=" .. found)
+                if global.debug then player.print("cycle_bp: result=" .. found) end
+            end
+        end
+    end)
+
+    if not stack then
+        return
+    end
+    player.clean_cursor()  -- May fail if inv is full, that's okay for now.
+    player.cursor_stack.swap_stack(stack)
+end
+
+
 
 -- Cycle between related items.
 local function cycle_item(event, change_group, reverse)
@@ -105,7 +205,7 @@ local function cycle_item(event, change_group, reverse)
     local item = mappings:find(cursor.name, history.category, history.group)
     if not item then
         if global.debug then player.print("Item " .. cursor.name .. " is not in catalog.") end
-        return
+        return cycle_bp(player, pdata, cursor, change_group, reverse)
     end
 
     if global.debug then

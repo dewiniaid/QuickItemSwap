@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.0
+Date: 23. 04. 2018
+  Changes:
+    - Add support for blueprints, blueprint books, deconstruction planners, and similar items from mods.
+      - Items of a particular type are treated as members of one group.  "Y" will cycle between different blueprint books, for instance.
+      - Cycling groups will cycle between selecting a blueprint, a blueprint book, or a deconstruction planner.
+      - Other items that have an item_number are also supported when cycling items, but do not support cycling groups.
+    - Added support for the Artillery Wagon
+    - Add support for Electric Vehicles (locomotives only)
+    - Add support for FARL (locomotives only)
+
+
+---------------------------------------------------------------------------------------------------
 Version: 0.2.4
 Date: 23. 12. 2017
   Changes:

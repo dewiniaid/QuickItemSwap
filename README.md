@@ -5,8 +5,25 @@ holding a transport belt, the "Next Item Group" keybind will pick up a Fast Tran
 have one) and the "Next Related Item" keybind will pick up a Splitter instead (again presuming you have one).
 
 A wide variety of items and groups are supported, including transport belts, inserters, train vehicles,
- railway and rail signals, inserters, pipes, and modules.  Support for entities added by other mods is planned.
+ railway and rail signals, inserters, pipes, and modules.     
+
+New in version 0.3.0 is the ability to cycle blueprints, blueprint books and deconstruction planners.  All blueprints
+are in one group, all blueprint books in a second group, and all deconstruction planners are in a third.  Thus, 
+"Next Item" with a blueprint book selected will find the next blueprint book in your inventory and select it.  "Next
+Group" cycles between the three types of items.  These *should* work with mods that add similar items; e.g. 
+[Picker Extended's](https://mods.factorio.com/mod/PickerExtended) option to add differently-colored blueprint books. 
+
  
+ Additionally, the following mods are supported.
+ 
+  * [Batteries Not Included](https://mods.factorio.com/mods/dewiniaid/BatteriesNotIncluded)
+  * [Electric Vehicles](https://mods.factorio.com/mod/ElectricVehicles3) (locomotive only)
+  * [FARL](https://mods.factorio.com/mod/FARL) (locomotive only)
+  * [Creative Mode](https://mods.factorio.com/mod/creative-mode-fix)
+  * [Logistic Train Network](https://mods.factorio.com/mod/LogisticTrainNetwork)
+  * [Smarter Trains](https://mods.factorio.com/mod/SmartTrains)
+  * [Nixie Tubes](https://mods.factorio.com/mod/nixie-tubes) (Just justarandomgeek's version currently)
+   
 ## Known Issues
 
 * Items on the quickbar without filters may change locations if the mod selects them, and the quickbar in
@@ -25,14 +42,19 @@ already been reported, and report it if not.
 
 ## Planned Features
 
-* Functionality for cycling between blueprint books and/or loose blueprints in inventory.
-* Functionality for cycling between different types of selection tools (e.g. blueprints, deconstruction 
-  planners, [justarandomgeek's Combinator Graph tool](https://mods.factorio.com/mods/justarandomgeek/combinatorgraph), 
-  and the various tools added by Nexela's [Picker Extended](https://mods.factorio.com/mods/Nexela/PickerExtended).)
-* API for mod developers (see below)
+* Support for more mods.
+* This list used to be longer, but then I implemented things.
 
- 
 ## Changelog
+
+### 0.3.0 (2018-04-23)
+* Add support for blueprints, blueprint books, deconstruction planners, and similar items from mods.
+  *  Items of a particular type are treated as members of one group.  "Y" will cycle between different blueprint books, for instance.
+  * Cycling groups will cycle between selecting a blueprint, a blueprint book, or a deconstruction planner.
+  * Other items that have an item_number are also supported when cycling items, but do not support cycling groups.
+* Added support for the Artillery Wagon
+* Add support for [Electric Vehicles](https://mods.factorio.com/mod/ElectricVehicles3) (locomotives only)
+* Add support for [FARL](https://mods.factorio.com/mod/FARL) (locomotives only)
 
 ### 0.2.4 (2017-12-23)
 * Add support for the unofficial Creative Mode Fix.
