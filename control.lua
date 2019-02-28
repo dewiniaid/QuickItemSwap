@@ -4,9 +4,8 @@ local Lib = require("qis/lib")
 local Mapper = require("qis/mapper")
 
 
-base_mappings = Mapper:adopt(require("mappings/base"))
-
 patches = {
+    require("mappings/base"),
     require("mappings/creative-mode"),
     require("mappings/LogisticTrainNetwork"),
     require("mappings/nixie-tubes"),
@@ -51,11 +50,15 @@ local function rebuild_mappings(why)
     setup_playerdata()
 
     -- Reconstructs mappings on new map/update/config change.
-    global.mappings = base_mappings:clone()
-    mappings = global.mappings
+    mappings = nil
     for _, patch in pairs(patches) do
-        mappings:merge(patch())
+        if not mappings then
+            mappings = Mapper:adopt(patch())
+        else
+            mappings:merge(patch())
+        end
     end
+    global.mappings = mappings
     script.raise_event(CUSTOM_EVENTS.on_qis_mappings_reset, { why = why })
 end
 
@@ -168,7 +171,6 @@ local function cycle_bp(player, pdata, cursor, change_group, reverse)
             if (found < number and (n < found or n > number)) or (n > number and n < found) then
                 found = n
                 stack = item
-                player.print("cycle_bp: result=" .. found)
                 if global.debug then player.print("cycle_bp: result=" .. found) end
             end
         end
@@ -220,9 +222,8 @@ local function cycle_item(event, change_group, reverse)
         )
     end
 
-    local stack, slot, newitem
-    local quickbar = player.get_quickbar()
-    local inv = player.get_inventory(defines.inventory.player_main)
+    local stack, newitem
+    local inv = player.get_main_inventory()
 
     local can_cheat = (
         player.cheat_mode
@@ -231,7 +232,7 @@ local function cycle_item(event, change_group, reverse)
     local will_cheat = false
 
     local function find_or_cheat_item(candidate)
-        stack, slot = Lib.find_item(candidate.name, quickbar, inv)
+        stack = inv.find_item_stack(candidate.name)
         if stack then
             newitem = candidate
             return true
@@ -248,7 +249,6 @@ local function cycle_item(event, change_group, reverse)
         end
         return false
     end
-
 
     if change_group then
         local candidate
@@ -294,7 +294,6 @@ local function cycle_item(event, change_group, reverse)
         end
     end
 
-    -- TODO: Handle quickbar preservation hacks for 0.15
     if stack or will_cheat then
         pdata.group_history[item.group.id] = item
         if stack then
@@ -317,7 +316,6 @@ script.on_event("qis-item-next", function(event) return cycle_item(event, false,
 script.on_event("qis-item-prev", function(event) return cycle_item(event, false, true) end)
 script.on_event("qis-group-next", function(event) return cycle_item(event, true, false) end)
 script.on_event("qis-group-prev", function(event) return cycle_item(event, true, true) end)
-
 
 
 -- Housekeeping

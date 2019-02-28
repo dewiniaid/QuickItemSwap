@@ -47,6 +47,12 @@ already been reported, and report it if not.
 
 ## Changelog
 
+### 0.3.1 (2019-02-27)
+* Update for Factorio 0.17.
+* Removed all quickbar logic.
+* Generate group information for belts/splitters/undergrounds procedurally.  This should automatically add support for
+  modded belts, such as those from Bob's Logistics.
+
 ### 0.3.0 (2018-04-23)
 * Add support for blueprints, blueprint books, deconstruction planners, and similar items from mods.
   *  Items of a particular type are treated as members of one group.  "Y" will cycle between different blueprint books, for instance.
@@ -161,7 +167,7 @@ If `player` is specified, results will be printed to that player; otherwise they
  
 Produces no output if everything is valid.
 
-#### `remote.call("QuickItemSwap", "apply_patch", source, patch)`
+#### `remote.call("QuickItemSwap", "apply_patch", patch, source)`
 
 Applies a patch to the mapping table.
 

@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.1
+Date: 27. 02. 2019
+  Changes:
+    - Update for Factorio 0.17.
+    - Removed all quickbar logic.
+    - Generate group information for belts/splitters/undergrounds procedurally.  This should automatically add support for modded belts, such as those from Bob's Logistics.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.3.0
 Date: 23. 04. 2018
   Changes:
@@ -9,7 +17,6 @@ Date: 23. 04. 2018
     - Added support for the Artillery Wagon
     - Add support for Electric Vehicles (locomotives only)
     - Add support for FARL (locomotives only)
-
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.4

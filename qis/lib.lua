@@ -38,29 +38,4 @@ function Lib.wraparound(t, start, reverse)
 end
 
 
-function Lib.find_item(item, quickbar, inv)
-    -- Finds an item stack with the specified name in the quickbar or inventory
-    -- Returns the LuaItemStack found and the quickbar slot it occupies (if found in the quickbar)
-    local stack
-
-    if quickbar then
-        stack = quickbar.find_item_stack(item)
-        if stack then
-            for i=1,#quickbar do
-                if stack == quickbar[i] then
-                    return stack,i
-                end
-            end
-            error("Found item stack in quickbar but could not find quickbar item slot of stack\n" .. debug.traceback())
-            return stack,nil
-        end
-    end
-
-    if inv then
-        stack = inv.find_item_stack(item)
-        return stack,nil
-    end
-end
-
-
 return Lib
