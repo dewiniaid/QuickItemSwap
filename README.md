@@ -50,8 +50,7 @@ already been reported, and report it if not.
 ### 0.3.1 (2019-02-27)
 * Update for Factorio 0.17.
 * Removed all quickbar logic.
-* Generate group information for belts/splitters/undergrounds procedurally.  This should automatically add support for
-  modded belts, such as those from Bob's Logistics.
+* Generate group information for belts/splitters/undergrounds procedurally.  This should automatically add support for modded belts, such as those from Bob's Logistics.
 
 ### 0.3.0 (2018-04-23)
 * Add support for blueprints, blueprint books, deconstruction planners, and similar items from mods.
