@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.2
+Date: 14. 03. 2019
+
+  Changes:
+    - QuickItemSwap can now cycle between item ghosts if you lack the actual item.
+      - By default, this excludes items that have not been researched.  You can globally disable this in Mod Settings, or you can whitelist specific items.
+    - You can now whitelist or blacklist items (default keybind: Alt+Y while holding an item)
+      - When cycling between related items, blacklisted items will be ignored (unless they are in your inventory)
+      - When cycling between related items, whitelisted items will be allowed (even if they are not yet researched)
+      - Blacklisting and whitelisting only affects cases when a ghost would be chosen or if an item would be created (in cheat mode).  Items in your inventory are always considered.
+      - You can reset your entire blacklist with /qis-clear-blacklist
+   - Added support for the train stops in the Train Supply Manager mod
+
+---------------------------------------------------------------------------------------------------
 Version: 0.3.1
 Date: 27. 02. 2019
   Changes:

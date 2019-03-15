@@ -14,6 +14,7 @@ patches = {
     require("mappings/BatteriesNotIncluded"),
     require("mappings/ElectricVehicles3"),
     require("mappings/FARL"),
+    require("mappings/TrainSupplyManager"),
     -- require("mappings/bobinserters"),
     -- require("mappings/boblogistics")
 }
@@ -27,7 +28,7 @@ CUSTOM_EVENTS = {
 }
 
 
-local function setup_playerdata()
+local function initialize_globals()
     if not global.playerdata then
         global.playerdata = {}
     end
@@ -38,6 +39,7 @@ local function setup_playerdata()
                 item_history = {},
                 group_history = {},
                 type_history = {},
+                blacklist = {},
             }
             t[k] = v
             return v
@@ -47,7 +49,7 @@ end
 
 
 local function rebuild_mappings(why)
-    setup_playerdata()
+    initialize_globals()
 
     -- Reconstructs mappings on new map/update/config change.
     mappings = nil
@@ -63,16 +65,53 @@ local function rebuild_mappings(why)
 end
 
 
+
+local function add_commands()
+    commands.add_command(
+            "qis-clear-blacklist",
+            "Resets your QuickItemSwap blacklist and whitelist to their defaults.", function()
+                global.playerdata[game.player.index].blacklist = {}
+                game.player.print({"qis-message.blacklist-cleared", game.player.name})
+            end
+    )
+end
+
+
 local function on_load()
     mappings = global.mappings
-    setup_playerdata()
+    initialize_globals()
+    add_commands()
     if mappings then
         Mapper:adopt(mappings)
     end
 end
 
 
-script.on_init(function() rebuild_mappings("init") end)
+-- Lazily create a list of what all techs produce a given item.
+item_techs = Lib.lazy_table(function(items_craftable)
+    local name, t
+    for recipe, data in pairs(game.recipe_prototypes) do
+        if data.products then
+            for _, product in pairs(data.products) do
+                if product.type == 'item' then
+                    name = product.name
+                    t = items_craftable[name]
+                    if not t then
+                        items_craftable[name] = { recipe }
+                    else
+                        t[#t + 1] = recipe
+                    end
+                end
+            end
+        end
+    end
+end)
+
+
+script.on_init(function()
+    rebuild_mappings("init")
+    add_commands()
+end)
 script.on_load(on_load)
 script.on_configuration_changed(function(_)
     if global.debug then
@@ -91,21 +130,21 @@ end)
 
 
 -- Cycle between blueprints/books/etc
-local function cycle_bp(player, pdata, cursor, change_group, reverse)
+local function cycle_bp(player, change_group, reverse)
+    local pdata = global.playerdata[player.index]
+    local cursor = player.cursor_stack
+
     if cursor.item_number == nil then
         return
     end
     local number = cursor.item_number
-    local qb = player.get_quickbar()
-    local inv = player.get_inventory(defines.inventory.player_main)
+    local inv = player.get_main_inventory()
     local stack
 
     local function foreachitem(fn)
-        for _,where in pairs({qb, inv}) do
-            for i=1,#where do
-                if fn(where[i], i, where) then
-                    return true
-                end
+        for i=1,#inv do
+            if fn(inv[i], i, inv) then
+                return true
             end
         end
         return false
@@ -148,7 +187,7 @@ local function cycle_bp(player, pdata, cursor, change_group, reverse)
     end  -- if change_group
 
     -- If still here, cycling between items within the group
-    local found, stack
+    local found
     foreachitem(function(item)
         if not (item.valid_for_read and item.type == cursor.type and item.item_number) then
             return
@@ -179,10 +218,49 @@ local function cycle_bp(player, pdata, cursor, change_group, reverse)
     if not stack then
         return
     end
+
     player.clean_cursor()  -- May fail if inv is full, that's okay for now.
-    player.cursor_stack.swap_stack(stack)
+    cursor.swap_stack(stack)
 end
 
+
+-- Determine if an item is blacklisted.
+local function is_blacklisted(player, item, requires_tech)
+    if requires_tech == nil then
+        requires_tech = player.mod_settings['QuickItemSwap-requires-tech'].value
+    end
+    local blacklist = global.playerdata[player.index].blacklist
+    if blacklist[item] then
+        return true
+    elseif blacklist[item] == false or not requires_tech then
+        return false
+    end
+
+    if not item_techs[item] then
+        if global.debug then
+            game.print("No item techs for " .. item)
+        end
+        return true
+    end
+
+    local recipes = player.force.recipes
+    for _, recipe in pairs(item_techs[item]) do
+        if recipes[recipe].enabled then
+            return false
+        end
+    end
+    return true
+end
+
+
+
+-- Some constants for find_or_cheat_item
+local FindResult = {
+    NOT_FOUND = false,
+    FOUND = 1,
+    CHEAT = 2,
+    GHOST = 3
+}
 
 
 -- Cycle between related items.
@@ -190,6 +268,9 @@ local function cycle_item(event, change_group, reverse)
     local player = game.players[event.player_index]
     local pdata = global.playerdata[player.index]
     local cursor = player.cursor_stack
+    local blacklist = pdata.blacklist
+
+    local source  -- Found mapping for source name.
 
     if global.debug then
         player.print("In cycle item.  change_group=" .. serpent.block(change_group) .. "; reverse=" .. serpent.block(reverse))
@@ -197,63 +278,97 @@ local function cycle_item(event, change_group, reverse)
 
     -- Do nothing if no item is currently selected.
     if not cursor.valid_for_read then
-        if global.debug then player.print("No item selected") end
-        return
+        if player.cursor_ghost then
+            source = player.cursor_ghost.name
+        else
+            if global.debug then player.print("No item selected") end
+            return
+        end
+    else
+        source = cursor.name
     end
 
-    local name = cursor.name
-    local history = pdata.item_history[name] or {}
-    -- Do nothing if the selected item is not in the catalog.
-    local item = mappings:find(cursor.name, history.category, history.group)
-    if not item then
+    -- Find item in the catalog.
+    local history = pdata.item_history[source] or {}
+    source = mappings:find(source, history.category, history.group)
+
+    -- If not found, pretend it's a blueprint and see what happens.
+    if not source then
         if global.debug then player.print("Item " .. cursor.name .. " is not in catalog.") end
-        return cycle_bp(player, pdata, cursor, change_group, reverse)
+        return cycle_bp(player, change_group, reverse)
     end
 
+    -- Still here?  Time to get to work.
     if global.debug then
         player.print(
-            "Item '" .. item.name .. "' is " .. item.index .. " of " .. #item.group.sorted
-            .. " in group " .. item.group.name
+                "Item '" .. source.name .. "' is " .. source.index .. " of " .. #source.group.sorted
+                        .. " in group " .. source.group.name
         )
-        player.print(item.type and ("Item equivalence type: " .. item.type) or "Item has no equivalence type")
+        player.print(source.type and ("Item equivalence type: " .. source.type) or "Item has no equivalence type")
         player.print(
-            "Group '" .. item.group.name .. "' is " .. item.group.index .. " of " .. #item.group.category.sorted
-            .. " in category " .. item.group.category.name
+                "Group '" .. source.group.name .. "' is " .. source.group.index .. " of " .. #source.group.category.sorted
+                        .. " in category " .. source.group.category.name
         )
     end
 
-    local stack, newitem
+    -- Look for suitable replacements
     local inv = player.get_main_inventory()
+    local stack  -- Item stack for replacement
+    local target  -- Mapping for replacement.
+    local result = FindResult.NOT_FOUND
 
+    -- Are we allowed to cheat new items in?
     local can_cheat = (
-        player.cheat_mode
-        and settings.get_player_settings(player)["QuickItemSwap-support-cheat-mode"].value
+            player.cheat_mode
+            and player.mod_settings["QuickItemSwap-support-cheat-mode"].value
     )
-    local will_cheat = false
 
-    local function find_or_cheat_item(candidate)
-        stack = inv.find_item_stack(candidate.name)
+    -- Can we create item ghosts?
+    local can_ghost = player.mod_settings["QuickItemSwap-use-ghosts"].value
+
+    local function find_or_cheat_item(entry)
+        -- Search for the item in the inventory
+        stack = inv.find_item_stack(entry.name)
         if stack then
-            newitem = candidate
-            return true
+            -- Well, that was easy.
+            target = entry
+            return FindResult.FOUND
         end
 
-        if can_cheat and game.item_prototypes[candidate.name] and (
-            not game.active_mods["creative-mode"]
-            or not string.find(candidate.name, "^creative%-mode%_")
-            or settings.get_player_settings(player)["QuickItemSwap-support-cheat-mode-with-creative"].value
-        ) then
-            will_cheat = true
-            newitem = candidate
-            return true
+        -- If we didn't find the item and we can't ghost or cheat, bail here.
+        if not (can_cheat or can_ghost) then
+            return FindResult.NOT_FOUND
         end
-        return false
+
+
+        if not game.item_prototypes[entry.name] then
+            -- No prototype exists, so bail
+            return FindResult.NOT_FOUND
+        end
+
+        if (
+                can_cheat and not is_blacklisted(player, entry.name, false)
+                    and (
+                    not game.active_mods["creative-mode"]
+                            or not string.find(entry.name, "^creative%-mode%_")
+                            or settings.get_player_settings(player)["QuickItemSwap-support-cheat-mode-with-creative"].value
+                ))
+        then
+            target = entry
+            return FindResult.CHEAT
+        end
+
+        if can_ghost and not is_blacklisted(player, entry.name) then
+            target = entry
+            return FindResult.GHOST
+        end
     end
+
 
     if change_group then
+        local type = source.type
         local candidate
-        local type = item.type
-        for index, group in Lib.wraparound(item.category.sorted, item.group.index, reverse) do
+        for index, group in Lib.wraparound(source.category.sorted, source.group.index, reverse) do
             if global.debug then
                 player.print("Next group: #" .. index .. " = " .. group.name)
             end
@@ -264,7 +379,9 @@ local function cycle_item(event, change_group, reverse)
                 if global.debug then
                     player.print("Candidate typed item: #" .. index .. " = " .. candidate.name)
                 end
-                if find_or_cheat_item(candidate) then break end
+
+                result = find_or_cheat_item(candidate)
+                if result then break end
             else
                 -- Untyped item, or group does not have this type.
                 if pdata.group_history[group.id] then
@@ -272,7 +389,8 @@ local function cycle_item(event, change_group, reverse)
                     if global.debug then
                         player.print("Candidate item from history: #" .. index .. " = " .. candidate.name)
                     end
-                    if find_or_cheat_item(candidate) then break end
+                    result = find_or_cheat_item(candidate)
+                    if result then break end
                 end
 
                 -- No candidate item, or candidate item doesn't exist.
@@ -281,33 +399,54 @@ local function cycle_item(event, change_group, reverse)
                     if global.debug then
                         player.print("Next candidate: #" .. index .. " = " .. candidate.name)
                     end
-                    if find_or_cheat_item(candidate) then break end
+                    result = find_or_cheat_item(candidate)
+                    if result then break end
                 end
             end -- of typed if/else
         end -- of group loop
     else
-        for index, candidate in Lib.wraparound(item.group.sorted, item.index, reverse) do
+        for index, candidate in Lib.wraparound(source.group.sorted, source.index, reverse) do
             if global.debug then
                 player.print("Next candidate: #" .. index .. " = " .. candidate.name)
             end
-            if find_or_cheat_item(candidate) then break end
+            result = find_or_cheat_item(candidate)
+            if result then break end
         end
     end
 
-    if stack or will_cheat then
-        pdata.group_history[item.group.id] = item
-        if stack then
-            player.clean_cursor()  -- May fail if inv is full, that's okay for now.
-            if player.cursor_stack.swap_stack(stack) then  -- Shouldn't* fail
-                pdata.group_history[newitem.group.id] = newitem
-                pdata.item_history[newitem.name] = newitem
-            end
-        elseif player.clean_cursor() then  -- May fail if inv is full, this is doubleplusungood.
-            player.cursor_stack.set_stack(newitem.name)  -- Automatically selects full stack.
-            pdata.group_history[newitem.group.id] = newitem
-            pdata.item_history[newitem.name] = newitem
+    if not result then return end
+
+    -- Save the last thing we used in this group.
+    pdata.group_history[source.group.id] = source
+
+    -- Found an actual real item.
+
+    -- Check the various possible results and attempt to update things.  If the update fails, return so that history
+    -- does not update.
+    if result == FindResult.FOUND then
+        player.clean_cursor()  -- May fail if inv is full, that's okay for now because we'll just swap it if that's the case
+        if not player.cursor_stack.swap_stack(stack) then
+            -- This SHOULDN'T fail, but might with a full and filtered inventory.
+            return
         end
+    elseif result == FindResult.CHEAT then
+        if not player.clean_cursor() then
+            -- If this happens, there's no way to conjure an item out of thin air without destroying something.
+            -- So don't.
+            return
+        end
+        cursor.set_stack(target.name)  -- Will automatically pick a full stack.
+    elseif result == FindResult.GHOST then
+        if not player.clean_cursor() then
+            -- If this happens, there's no way to conjure an item out of thin air without destroying something.
+            -- So don't.
+            return
+        end
+        player.cursor_ghost = target.name
     end
+
+    pdata.group_history[target.group.id] = target
+    pdata.item_history[target.name] = target
 end
 
 
@@ -324,6 +463,38 @@ script.on_event(defines.events.on_player_removed, function(event)
         global.playerdata[event.player_index] = nil
     end
 end)
+
+
+-- Blacklist support.
+script.on_event("qis-toggle-blacklist", function(event)
+    local player = game.players[event.player_index]
+    local pdata = global.playerdata[player.index]
+    local blacklist = pdata.blacklist
+
+    local proto
+
+    if player.cursor_stack.valid_for_read then
+        proto = player.cursor_stack.prototype
+    elseif player.cursor_ghost then
+        proto = player.cursor_ghost
+    else
+        return
+    end
+
+    local name = proto.name
+
+    if blacklist[name] == nil then
+        blacklist[name] = true
+        player.print({"qis-message.item-blacklisted", proto.localised_name})
+    elseif blacklist[name] == true then
+        blacklist[name] = false
+        player.print({"qis-message.item-whitelisted", proto.localised_name})
+    else
+        blacklist[name] = nil
+        player.print({"qis-message.item-defaulted", proto.localised_name})
+    end
+end)
+
 
 
 -- API

@@ -38,4 +38,27 @@ function Lib.wraparound(t, start, reverse)
 end
 
 
+function Lib.lazy_table(fn)
+    --[[
+    -- Creates a lazily-initialized table.
+    ]]
+
+    local t = {}
+
+    setmetatable(t, {
+        __index = function(k)
+            setmetatable(t, nil)
+            fn(t)
+            return t[k]
+        end,
+        __newindex = function(k, v)
+            setmetatable(t, nil)
+            fn(t)
+            t[k] = v
+        end,
+    })
+
+    return t
+end
+
 return Lib

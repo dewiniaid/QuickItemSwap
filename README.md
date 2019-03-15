@@ -2,16 +2,14 @@
 
 Quick Item Swap is a mod that enables you to quickly change between related items.  For instance, if you're currently
 holding a transport belt, the "Next Item Group" keybind will pick up a Fast Transport Belt instead (presuming you 
-have one) and the "Next Related Item" keybind will pick up a Splitter instead (again presuming you have one).
+have one) and the "Next Related Item" keybind will pick up a Splitter instead (again presuming you have one).  By
+default, 
 
 A wide variety of items and groups are supported, including transport belts, inserters, train vehicles,
  railway and rail signals, inserters, pipes, and modules.     
 
-New in version 0.3.0 is the ability to cycle blueprints, blueprint books and deconstruction planners.  All blueprints
-are in one group, all blueprint books in a second group, and all deconstruction planners are in a third.  Thus, 
-"Next Item" with a blueprint book selected will find the next blueprint book in your inventory and select it.  "Next
-Group" cycles between the three types of items.  These *should* work with mods that add similar items; e.g. 
-[Picker Extended's](https://mods.factorio.com/mod/PickerExtended) option to add differently-colored blueprint books. 
+New in version 0.3.2 is the ability for item cycling to place ghosts of items you do not have, and the ability to 
+whitelist or blacklist specific items. 
 
  
  Additionally, the following mods are supported.
@@ -21,7 +19,9 @@ Group" cycles between the three types of items.  These *should* work with mods t
   * [FARL](https://mods.factorio.com/mod/FARL) (locomotive only)
   * [Creative Mode](https://mods.factorio.com/mod/creative-mode-fix)
   * [Logistic Train Network](https://mods.factorio.com/mod/LogisticTrainNetwork)
+  * [Train Supply Manager](https://mods.factorio.com/mod/train-pubsub)
   * [Smarter Trains](https://mods.factorio.com/mod/SmartTrains)
+  * [Vehicle Wagon](https://mods.factorio.com/mod/Vehicle%20Wagon)
   * [Nixie Tubes](https://mods.factorio.com/mod/nixie-tubes) (Just justarandomgeek's version currently)
    
 ## Known Issues
@@ -40,12 +40,19 @@ Group" cycles between the three types of items.  These *should* work with mods t
 Found a bug?  Please visit the [Issues page](https://github.com/dewiniaid/QuickItemSwap/issues) to see if it has 
 already been reported, and report it if not.
 
-## Planned Features
-
-* Support for more mods.
-* This list used to be longer, but then I implemented things.
-
 ## Changelog
+
+### 0.3.2 (2019-03-14)
+*a.k.a. version 0.3.14159*
+* QuickItemSwap can now cycle between item ghosts if you lack the actual item.
+  * By default, this excludes items that have not been researched.  You can globally disable this in Mod Settings, or you can whitelist specific items.
+* You can now whitelist or blacklist items (default keybind: Alt+Y while holding an item)
+  * When cycling between related items, blacklisted items will be ignored (unless they are in your inventory)
+  * When cycling between related items, whitelisted items will be allowed (even if they are not yet researched)
+  * Blacklisting and whitelisting only affects cases when a ghost would be chosen or if an item would be created (in cheat mode).  Items in your inventory are always considered.
+  * You can reset your entire blacklist with `/qis-clear-blacklist`
+* Added support for the train stops in [Train Supply Manager](https://mods.factorio.com/mod/train-pubsub)
+* Fixed possible crash when cycling blueprints.
 
 ### 0.3.1 (2019-02-27)
 * Update for Factorio 0.17.

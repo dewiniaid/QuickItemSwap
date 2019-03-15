@@ -25,4 +25,10 @@ data:extend({
         key_sequence = "SHIFT + Y",
         consuming = "all"
     },
+    {
+        type = "custom-input",
+        name = "qis-toggle-blacklist",
+        key_sequence = "ALT + Y",
+        consuming = "all"
+    },
 })
