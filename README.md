@@ -42,6 +42,9 @@ already been reported, and report it if not.
 
 ## Changelog
 
+### 0.3.3 (2020-01-31)
+* **Update for Factorio 0.18**
+
 ### 0.3.2 (2019-03-14)
 *a.k.a. version 0.3.14159*
 * QuickItemSwap can now cycle between item ghosts if you lack the actual item.
@@ -55,7 +58,7 @@ already been reported, and report it if not.
 * Fixed possible crash when cycling blueprints.
 
 ### 0.3.1 (2019-02-27)
-* Update for Factorio 0.17.
+* **Update for Factorio 0.17.**
 * Removed all quickbar logic.
 * Generate group information for belts/splitters/undergrounds procedurally.  This should automatically add support for modded belts, such as those from Bob's Logistics.
 
@@ -73,7 +76,7 @@ already been reported, and report it if not.
 * Add Buffer Chests to the Logistic Chests group, and reordered the group to match the inventory window.
 
 ### 0.2.3 (2017-12-13)
-* Update for Factorio 0.16
+* **Update for Factorio 0.16**
 * Temporarily add support for Batteries Not Included, since [a bug in the current Factorio experimental](https://forums.factorio.com/viewtopic.php?f=182&t=54567&p=321491) prevents that support from working in the opposite direction.
 * API: Added more verbose error messaging if another mod submits an invalid patch.
 * API: Swapped the order of arguments on `apply_patch` to make it less likely for someone to inadvertently forget to
