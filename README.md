@@ -42,6 +42,9 @@ already been reported, and report it if not.
 
 ## Changelog
 
+### 0.3.4 (2020-06-14)
+* Fix crash for 'Unknown consuming type' when loading mod
+
 ### 0.3.3 (2020-01-31)
 * **Update for Factorio 0.18**
 
